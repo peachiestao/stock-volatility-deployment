@@ -21,12 +21,15 @@ scaler = joblib.load('scaler.pkl')
 # --- SMART SHAPE DETECTION ---
 # Check if the model expects a sequence (LSTM/CNN) or flat data (FFN)
 input_shape = model.input_shape
-# If shape is (None, 10, 10), it expects 10 days of history (LSTM/CNN)
-# If shape is (None, 10), it expects 1 day of history (FFN)
 NEEDS_SEQUENCE = len(input_shape) == 3 
 SEQ_LENGTH = input_shape[1] if NEEDS_SEQUENCE else 1
 
 print(f"Model loaded! Expects sequences: {NEEDS_SEQUENCE} (Length: {SEQ_LENGTH})")
+
+# --- CONFIGURATION ---
+# Only these tickers will trigger a prediction.
+# "AAPL" or "Two" will be ignored.
+ALLOWED_TICKERS = ['TSLA', 'SPY']
 
 def get_latest_features(ticker):
     """
@@ -58,23 +61,16 @@ def get_latest_features(ticker):
     df_target = engineer(data_target)
     df_spy = engineer(data_spy)
 
-    # 4. Select the required amount of data (Last 1 day OR Last 10 days)
-    # We perform an inner join on index to align dates
+    # 4. Merge & Select Data
     merged_df = pd.merge(df_target, df_spy, left_index=True, right_index=True, suffixes=('_Target', '_SPY'))
-    
-    # Get the most recent N rows
     recent_data = merged_df.iloc[-SEQ_LENGTH:].values
 
-    # 5. Scale the data (The scaler expects 2D data)
+    # 5. Scale & Reshape
     scaled_data = scaler.transform(recent_data)
     
-    # 6. Reshape for the Model
     if NEEDS_SEQUENCE:
-        # LSTM/CNN expects (1, 10, 10) -> (Batch, Time Steps, Features)
         final_input = np.array([scaled_data])
     else:
-        # FFN expects (1, 10) -> (Batch, Features)
-        # We just take the single last row
         final_input = np.array([scaled_data[-1]])
     
     return final_input
@@ -85,8 +81,17 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    ticker = request.form['ticker'].upper()
+    # Get user input, remove whitespace, force uppercase
+    # "appl " becomes "APPL"
+    ticker = request.form['ticker'].upper().strip()
     
+    # --- VALIDATION STEP ---
+    # If input is NOT 'TSLA' or 'SPY', we stop here.
+    # We return the template with NO variables, so the result area is empty.
+    if ticker not in ALLOWED_TICKERS:
+        logging.warning(f"Ignored unsupported input: {ticker}")
+        return render_template('index.html') 
+
     try:
         # 1. Get Smart Features
         input_features = get_latest_features(ticker)
@@ -105,10 +110,9 @@ def predict():
                              score_text=f'(Confidence Score: {raw_score:.4f})')
 
     except Exception as e:
+        # On any error (e.g., internet issue), also show nothing to the user
         logging.error(f"Error predicting {ticker}: {str(e)}")
-        # Print error to terminal too so you can see it easily
-        print(f"ERROR: {str(e)}")
-        return render_template('index.html', prediction_text=f'Error: {str(e)}')
+        return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
