@@ -15,6 +15,10 @@ app = Flask(__name__)
 # Setup Logging (System logs)
 logging.basicConfig(filename='system.log', level=logging.INFO)
 
+# --- CONFIGURATION ---
+# Only allow these tickers. Everything else will be ignored.
+ALLOWED_TICKERS = ['TSLA', 'SPY', 'AAPL', 'NVDA', 'AMZN']
+
 # Production Data Log (For Model Monitoring)
 PROD_LOG_FILE = 'production_logs.csv'
 FEATURE_COLS = [
@@ -90,7 +94,15 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    ticker = request.form['ticker'].upper()
+    # Get ticker, strip whitespace, force uppercase
+    ticker = request.form['ticker'].upper().strip()
+    
+    # --- VALIDATION STEP ---
+    # If input is not in our allowed list, fail silently (show nothing)
+    if ticker not in ALLOWED_TICKERS:
+        logging.warning(f"Ignored unsupported input: {ticker}")
+        return render_template('index.html')
+
     try:
         # 1. Get Features
         model_input, raw_features = get_latest_features(ticker)
@@ -111,7 +123,9 @@ def predict():
 
     except Exception as e:
         logging.error(f"Error predicting {ticker}: {str(e)}")
-        return render_template('index.html', prediction_text=f'Error: {str(e)}')
+        # For real errors (like yfinance failure), we also fail silently to be safe
+        # or you can show specific text if preferred.
+        return render_template('index.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
