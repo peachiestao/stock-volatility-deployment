@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 # Configuration (Must match your notebook)
 TARGET_TICKER = 'TSLA'
-START_DATE = '2020-01-01' 
+START_DATE = '2010-01-01' 
 # We fetch data up to yesterday to simulate the training set
 END_DATE = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
 
@@ -38,4 +38,5 @@ reference_df = reference_df.dropna()
 
 # Save to CSV for the monitoring system
 reference_df.to_csv('reference_data.csv', index=False)
+
 print(f"Reference data saved: {reference_df.shape}")
