@@ -1,0 +1,9 @@
+email:
+  to: "prabha.aralikatti@gmail.com"
+  from: "model-alerts@system.com"
+
+smtp:
+  server: "smtp.gmail.com"
+  port: 587
+  user: "prabha aralikatti"
+  pass: "your_app_password"
