@@ -6,3 +6,4 @@ ta
 yfinance
 scikit-learn
 joblib
+evidently =0.7.16
