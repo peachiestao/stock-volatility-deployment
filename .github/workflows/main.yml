@@ -1,0 +1,41 @@
+name: ML Pipeline CI
+
+# Trigger on push to main branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Checkout code
+    - uses: actions/checkout@v3
+
+    # 2. Set up Python
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.9"
+
+    # 3. Install Dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        # Install linter
+        pip install flake8
+
+    # 4. Run Linter (Code Quality Check)
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    # 5. Run Unit Tests
+    - name: Run Unit Tests
+      run: |
+        python tests.py
