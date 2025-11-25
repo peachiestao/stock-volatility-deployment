@@ -111,7 +111,7 @@ def predict():
         prediction = model.predict(model_input)
         raw_score = float(prediction[0][0])
         pred_class = 1 if raw_score > 0.5 else 0
-        result_text = "HIGH RISK" if pred_class == 1 else "NORMAL"
+        result_text = "HIGH RISK" if pred_class == 1 else "LOW RISK"
         
         # 3. Log for Monitoring
         log_to_csv(raw_features, raw_score, pred_class)
