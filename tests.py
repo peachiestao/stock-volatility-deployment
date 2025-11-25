@@ -43,10 +43,5 @@ class FlaskIntegrationTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-```
 
-### **How to Run It**
-Now that your main file is named `deploy.py`, make sure to run the tests like this:
 
-```bash
-python tests.py
