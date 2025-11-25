@@ -21,7 +21,7 @@ def feature_engineering(df):
     df['Volatility'] = (df['High'] - df['Low']) / df['Close']
     df['RSI'] = ta.momentum.RSIIndicator(df['Close'], window=14).rsi()
     df['SMA'] = ta.trend.SMAIndicator(df['Close'], window=21).sma_indicator()
-    df['Return'] = (df['Close'] - df['Open']) / df['Open']
+    df['Return'] = (df['Close'] - df['Open']) / df['Open']   
     # Use Volume directly
     return df[['Volatility', 'RSI', 'SMA', 'Return', 'Volume']]
 
