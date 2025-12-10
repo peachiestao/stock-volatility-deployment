@@ -12,12 +12,33 @@ This project implements a complete machine-learning workflow for financial volat
 
 The goal is to maintain a fully operational MLOps lifecycle where the model adapts to changing data distributions.
 
+Follow the steps below to set up the environment, train the model, deploy it, monitor data drift, run automated retraining, and validate the system using tests.
+
+1. Install requirements
+    pip install -r requirements.txt
+
+2. Train initial model
+    build_model.ipynb
+
+3. Deployment
+    python deploy.py
+
+4. Monitor drift
+    python monitor.py
+
+5. Retrain the model
+    python train_model.py
+
+6. Validate system integrity
+    python test.py
+
 Repository Structure:
 .
 ├── build_model.ipynb       # Data Preprocessing + model training + model saving script
 ├── deploy.py               # Model deployment and prediction service
 ├── monitor.py              # Data drift monitoring pipeline
 ├── train_model.py          # Automated retraining pipeline (triggered by monitor)
+├── test.py                 # Validate system integrity
 ├── reference_data.csv      # Data used to define baseline distributions
 ├── production_logs.csv     # New (live) data used for monitoring
 └── monitor.log             # monitoring script log
@@ -30,6 +51,7 @@ Repository Structure:
 │   ├── tsla_targetdrift_report.html   # data drift report
 │   └── tsla_datadrift_report.json
 └── requirements.txt  # installation packages
+
 
 
 
