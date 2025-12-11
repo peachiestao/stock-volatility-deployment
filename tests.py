@@ -14,7 +14,7 @@ class FlaskIntegrationTest(unittest.TestCase):
         print("\nRunning Test 1: Home Page Availability...")
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        print("✅ Home Page Test Passed")
+        print("Home Page Test Passed")
 
     def test_allowed_ticker(self):
         """Test 2: Ensure a valid ticker (TSLA) generates a prediction."""
@@ -23,7 +23,7 @@ class FlaskIntegrationTest(unittest.TestCase):
         response = self.app.post('/predict', data={'ticker': 'TSLA'})
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Prediction', response.data)
-        print("✅ Valid Ticker Test Passed")
+        print("Valid Ticker Test Passed")
 
     def test_invalid_ticker_logic(self):
         """Test 3: Ensure invalid tickers (TWO123) are silently ignored."""
@@ -32,16 +32,17 @@ class FlaskIntegrationTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         # The page should load, but NOT contain the prediction text
         self.assertNotIn(b'Confidence Score', response.data)
-        print("✅ Invalid Ticker Gatekeeper Test Passed")
+        print("Invalid Ticker Gatekeeper Test Passed")
 
     def test_config_consistency(self):
         """Test 4: Ensure configuration allows our core stocks."""
         print("\nRunning Test 4: Configuration Check...")
         self.assertIn('TSLA', ALLOWED_TICKERS)
         self.assertIn('SPY', ALLOWED_TICKERS)
-        print("✅ Configuration Test Passed")
+        print("Configuration Test Passed")
 
 if __name__ == "__main__":
     unittest.main()
+
 
 
